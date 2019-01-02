@@ -17,6 +17,16 @@
           </div>
         </th>
         <th>
+          <table>
+            <tr>
+              <td width="100">
+                <input type="text" placeholder="주문자명" v-model="orderToAdd.recipient">
+              </td>
+              <td>
+                <input type="text" v-model="orderToAdd.rawStr" @keypress.enter="addOrder()">
+              </td>
+            </tr>
+          </table>
         </th>
       </tr>
       <tr>
@@ -36,6 +46,29 @@
         </td>
         <td :style="`height: ${size.winH - size.thH}px`">
           <div class="scroller" :style="`height: ${size.winH - size.thH}px`">
+            <div class="order" v-for="(order, idx) in orders" :key="idx">
+              <div class="recipient">
+                <input v-model="order.recipient"/>
+              </div>
+              <div>
+                <input v-model="order.rawStr"/>
+              </div>
+              <div class="rawStrExtra">
+                <input v-model="order.rawStrExtra"/>
+              </div>
+              <div class="product">
+                <table>
+                  <tr v-for="(prod, idx) in order.prodList" :key="idx">
+                    <td width="36">
+                      {{prod.key}}
+                    </td>
+                    <td>
+                      {{prod.name}}
+                    </td>
+                  </tr>
+                </table>
+              </div>
+            </div>
           </div>
         </td>
       </tr>
@@ -49,12 +82,17 @@ export default {
   name: 'Dashboard',
   data: () => {
     return {
-      filter: '',
       size: {
         winH: 0,
         leftW: 224,
         thH: 56,
-      }
+      },
+      filter: '',
+      orderToAdd: {
+        recipient: '',
+        rawStr: ''
+      },
+      orders: []
     }
   },
   computed: {
@@ -71,6 +109,25 @@ export default {
   methods: {
     toProdStr () {
       this.$router.push('prod-str')
+    },
+    addOrder () {
+      let recipient = this.orderToAdd.recipient
+      let rawStr = this.orderToAdd.rawStr
+      this.orderToAdd.recipient = ''
+      this.orderToAdd.rawStr = ''
+      let prods = []
+      rawStr.match(/\w{1}\d{1,2}/gi).map((matched) => {
+        prods.push({
+          key: matched.toUpperCase(),
+          name: prod_str[matched.toUpperCase()]
+        })
+      })
+      this.orders.push ({
+        recipient: recipient,
+        rawStr: rawStr,
+        rawStrExtra: '',
+        prodList: prods
+      })
     }
   },
   mounted () {
@@ -79,72 +136,5 @@ export default {
 }
 </script>
 
-<style scoped lang="scss">
-  .dashboard {
-    .outer {
-      width: 100%;
-      tr {
-        th {
-          &:first-child {
-            background-color: #333;
-            border-bottom: 1px solid #333;
-            .filter-n-btn {
-              padding: 12px;
-              table {
-                width: 100%;
-                * {
-                  height: 32px;
-                }
-                input {
-                  width: 100%;
-                  margin: 0;
-                  padding: 0 8px;
-                  border: 0;
-                  outline: 0;
-                  font-size: 0.9em;
-                }
-                button {
-                  width: 64px;
-                  font-size: 0.8em;
-                }
-              }
-            }
-          }
-          background-color: #eee;
-          border-bottom: 1px solid #ccc;
-          button {
-            width: 100%;
-          }
-        }
-        & > td {
-          vertical-align: top;
-          &:first-child {
-            color: white;
-            background-color: #444;
-            font-size: 0.92em;
-            table {
-              width: 100%;
-              tr {
-                &:nth-child(even) {
-                  td {
-                    background-color: rgba(0, 0, 0, 0.1);
-                  }
-                }
-                & > td {
-                  padding-top: 6px;
-                  padding-bottom: 6px;
-                  &:first-child {
-                    padding-left: 12px;
-                  }
-                }
-              }
-            }
-          }
-          .scroller {
-            overflow-y: scroll;
-          }
-        }
-      }
-    }
-  }
+<style scoped lang="scss" src="../assets/scss/dashboard.scss">
 </style>
