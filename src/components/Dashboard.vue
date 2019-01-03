@@ -47,19 +47,25 @@
         <td :style="`height: ${size.winH - size.thH}px`">
           <div class="scroller" :style="`height: ${size.winH - size.thH}px`">
             <div class="order" v-for="(order, idx) in orders" :key="idx">
+              <span class="title">
+                주문 {{idx + 1}}
+              </span>
+              <span class="xbtn" @click="deleteOrder(idx)">
+                ✕
+              </span>
               <div class="recipient">
                 <input v-model="order.recipient"/>
               </div>
-              <div>
-                <input v-model="order.rawStr"/>
-              </div>
               <div class="rawStrExtra">
-                <input v-model="order.rawStrExtra"/>
+                <input v-model="order.rawStrExtra" @keypress.enter="addExtra(idx)"/>
               </div>
               <div class="product">
                 <table>
-                  <tr v-for="(prod, idx) in order.prodList" :key="idx">
-                    <td width="36">
+                  <tr v-for="(prod, idx) in order.prodList" :key="idx" :class="(idx) % 5 == 0 ? 'fifth' : ''">
+                    <td width="30">
+                      {{idx + 1}}
+                    </td>
+                    <td width="36" class="key">
                       {{prod.key}}
                     </td>
                     <td>
@@ -117,17 +123,34 @@ export default {
       this.orderToAdd.rawStr = ''
       let prods = []
       rawStr.match(/\w{1}\d{1,2}/gi).map((matched) => {
-        prods.push({
-          key: matched.toUpperCase(),
-          name: prod_str[matched.toUpperCase()]
-        })
+        if (prod_str[matched.toUpperCase()] != undefined) {
+          prods.push({
+            key: matched.toUpperCase(),
+            name: prod_str[matched.toUpperCase()]
+          })
+        }
       })
       this.orders.push ({
         recipient: recipient,
-        rawStr: rawStr,
         rawStrExtra: '',
         prodList: prods
       })
+    },
+    addExtra (idx) {
+      let prods = []
+      this.orders[idx].rawStrExtra.match(/\w{1}\d{1,2}/gi).map((matched) => {
+        if (prod_str[matched.toUpperCase()] != undefined) {
+          prods.push({
+            key: matched.toUpperCase(),
+            name: prod_str[matched.toUpperCase()]
+          })
+        }
+      })
+      this.orders[idx].prodList = this.orders[idx].prodList.concat(prods)
+      this.orders[idx].rawStrExtra = ''
+    },
+    deleteOrder (idx) {
+      this.orders.splice(idx, 1)
     }
   },
   mounted () {
