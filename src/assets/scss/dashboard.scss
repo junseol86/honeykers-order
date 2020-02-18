@@ -153,3 +153,20 @@
     }
   }
 }
+
+@media (max-device-width: 640px) {
+  .outer > tr > th:first-child, 
+  .outer > tr > td:first-child {
+    display: none;
+  }
+
+  .dashboard .outer>tr>td:last-child .order {
+    width: calc(100% - 66px);
+  }
+
+  .dashboard .outer>tr>td:last-child .order > div,
+  .dashboard .outer>tr>td:last-child .order > div input,
+  .dashboard .outer>tr>td:last-child .order > div table {
+    width: 100%;
+  }
+}
